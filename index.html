@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>保育園おさんぽマップメーカー</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <style>
+      /* Ensure leaflet map fills its container */
+      .leaflet-container {
+        height: 100%;
+        width: 100%;
+      }
+      /* Custom print styles */
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .leaflet-control-zoom {
+            display: none !important; /* Hide default controls on print */
+        }
+      }
+      /* Custom divIcon styles for stamps */
+      .custom-leaflet-icon {
+        background: transparent !important;
+        border: none !important;
+        pointer-events: none; /* Allow clicks to pass through transparent parts of the wrapper */
+      }
+      .custom-leaflet-icon > div {
+        pointer-events: auto; /* Re-enable pointer events for the visible content */
+        position: absolute;
+        transform: translate(-50%, -100%); /* Position the bottom-center of the stamp at the coordinate */
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react-leaflet": "https://aistudiocdn.com/react-leaflet@^5.0.0",
+    "leaflet": "https://aistudiocdn.com/leaflet@^1.9.4"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="overflow-hidden">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>

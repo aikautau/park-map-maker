@@ -1,0 +1,5 @@
+{
+  "name": "保育園おさんぽマップメーカー (Park Map Maker)",
+  "description": "保育士が散歩先の公園マップを簡単に作成し、印刷できるウェブアプリです。遊具や注意事項をスタンプで追加できます。(A web application for preschool teachers to easily create and print park maps for walks. You can add stamps for playground equipment and precautions.)",
+  "requestFramePermissions": []
+}
