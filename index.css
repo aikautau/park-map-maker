@@ -1,0 +1,19 @@
+/* Reset and base styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+/* Ensure leaflet map fills its container */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
