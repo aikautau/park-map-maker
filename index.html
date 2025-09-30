@@ -1,36 +1,284 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>保育園おさんぽマップメーカー</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin=""/>
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/index.css">
-    
-    <!-- Import Map for React and dependencies -->
-    <script type="importmap">
-    {
-      "imports": {
-        "react/": "https://aistudiocdn.com/react@^19.1.1/",
-        "react": "https://aistudiocdn.com/react@^19.1.1",
-        "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
-        "react-leaflet": "https://aistudiocdn.com/react-leaflet@^5.0.0",
-        "leaflet": "https://aistudiocdn.com/leaflet@^1.9.4"
-      }
-    }
-    </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        #app {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+
+        #toolbar {
+            width: 280px;
+            background: white;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .stamp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stamp-btn {
+            padding: 15px 10px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .stamp-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .stamp-btn.active {
+            border-color: #000;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.2);
+        }
+
+        .tool-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .tool-btn:hover {
+            opacity: 0.9;
+        }
+
+        .tool-btn.primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .tool-btn.secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .tool-btn.active {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        /* Print Preview */
+        #print-preview {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 210mm;
+            height: 297mm;
+            border: 3px dashed #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+            pointer-events: none;
+            z-index: 999;
+            display: none;
+        }
+
+        #print-preview.active {
+            display: block;
+        }
+
+        #print-preview::before {
+            content: 'A4印刷範囲';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #3b82f6;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Modal */
+        #modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        #modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            #app {
+                flex-direction: column-reverse;
+            }
+            
+            #toolbar {
+                width: 100%;
+                height: 200px;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+                padding: 15px;
+            }
+
+            .stamp-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+
+            .stamp-btn {
+                padding: 10px 5px;
+                font-size: 11px;
+            }
+
+            .tool-btn {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            h2 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Print */
+        @media print {
+            #toolbar,
+            #print-preview,
+            .leaflet-control-zoom,
+            .leaflet-control-attribution {
+                display: none !important;
+            }
+
+            #app {
+                display: block;
+            }
+
+            #map {
+                width: 100% !important;
+                height: 100% !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <div id="app">
+        <div id="map"></div>
+        <div id="print-preview"></div>
+        
+        <div id="toolbar">
+            <h2>🎨 スタンプ選択</h2>
+            <div class="stamp-grid" id="stamp-grid"></div>
+            
+            <h2>🛠️ ツール</h2>
+            <button class="tool-btn secondary" onclick="gotoCurrentLocation()">📍 現在地へ</button>
+            <button class="tool-btn secondary" id="preview-btn" onclick="togglePreview()">📄 印刷範囲</button>
+            <button class="tool-btn primary" onclick="window.print()">🖨️ 印刷する</button>
+        </div>
+    </div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <h3>メモを入力</h3>
+            <textarea id="memo-input" placeholder="ここにメモを入力..."></textarea>
+            <div class="modal-buttons">
+                <button class="tool-btn secondary" onclick="closeModal()">キャンセル</button>
+                <button class="tool-btn primary" onclick="addMemo()">追加</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module" src="/main.ts"></script>
 </body>
 </html>
