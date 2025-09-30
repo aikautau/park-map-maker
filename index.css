@@ -1,5 +1,9 @@
-/* Reset and base styles */
-html, body {
+/* Reset and ensure full height */
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -7,13 +11,33 @@ html, body {
   overflow: hidden;
 }
 
-#root {
-  height: 100%;
-  width: 100%;
-}
-
 /* Ensure leaflet map fills its container */
 .leaflet-container {
-  height: 100%;
-  width: 100%;
+  height: 100% !important;
+  width: 100% !important;
+  z-index: 0;
+}
+
+/* Custom divIcon styles for stamps */
+.custom-leaflet-icon {
+  background: transparent !important;
+  border: none !important;
+  pointer-events: none;
+}
+
+.custom-leaflet-icon > div {
+  pointer-events: auto;
+  position: absolute;
+  transform: translate(-50%, -100%);
+}
+
+/* Print styles */
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .leaflet-control-zoom {
+    display: none !important;
+  }
 }

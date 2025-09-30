@@ -82,30 +82,38 @@ const MapController: React.FC<{setMap: (map: Map) => void}> = ({ setMap }) => {
 const MapComponent: React.FC<MapComponentProps> = ({ stamps, onMapClick, onDeleteStamp, setMap }) => {
   
   return (
-    <MapContainer center={[35.6895, 139.6917]} zoom={13} scrollWheelZoom={true} className="w-full h-full z-0">
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <MapController setMap={setMap} />
-      <MapEvents onMapClick={onMapClick} />
-      {stamps.map((stamp) => (
-        <Marker key={stamp.id} position={stamp.position} icon={createCustomIcon(stamp)}>
-          <Popup>
-            <div className="text-center">
-              <p className="font-bold">{stamp.type === StampType.MEMO ? 'メモ' : stamp.type}</p>
-              {stamp.text && <p className="my-2">{stamp.text}</p>}
-              <button
-                onClick={() => onDeleteStamp(stamp.id)}
-                className="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
-              >
-                削除
-              </button>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <MapContainer 
+        center={[35.6895, 139.6917]} 
+        zoom={13} 
+        scrollWheelZoom={true} 
+        style={{ width: '100%', height: '100%' }}
+        zoomControl={true}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <MapController setMap={setMap} />
+        <MapEvents onMapClick={onMapClick} />
+        {stamps.map((stamp) => (
+          <Marker key={stamp.id} position={stamp.position} icon={createCustomIcon(stamp)}>
+            <Popup>
+              <div className="text-center">
+                <p className="font-bold">{stamp.type === StampType.MEMO ? 'メモ' : stamp.type}</p>
+                {stamp.text && <p className="my-2">{stamp.text}</p>}
+                <button
+                  onClick={() => onDeleteStamp(stamp.id)}
+                  className="mt-2 px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-colors"
+                >
+                  削除
+                </button>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    </div>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useRef } from 'react';
 import { Map, LatLng } from 'leaflet';
 import { Stamp, StampType } from './types';
@@ -60,27 +59,29 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-gray-100 flex flex-col md:flex-row print:flex-col">
+    <div style={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <header className="w-full p-4 bg-white shadow-md print:block hidden">
         <h1 className="text-2xl font-bold text-center">おさんぽマップ</h1>
       </header>
-      <main className="flex-grow relative">
-        <MapComponent
-          stamps={stamps}
-          onMapClick={handleMapClick}
-          onDeleteStamp={handleDeleteStamp}
-          setMap={map => mapRef.current = map}
+      <div style={{ display: 'flex', flexDirection: 'row', flex: 1, overflow: 'hidden' }} className="print:flex-col">
+        <main style={{ flex: 1, position: 'relative', height: '100%' }}>
+          <MapComponent
+            stamps={stamps}
+            onMapClick={handleMapClick}
+            onDeleteStamp={handleDeleteStamp}
+            setMap={map => mapRef.current = map}
+          />
+          <div className="hidden print:block print:fixed print:bottom-2 print:left-2 text-xs bg-white/80 p-1 rounded z-[1000]">
+            地図データ © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors
+          </div>
+        </main>
+        <Toolbar
+          selectedStampType={selectedStampType}
+          onSelectStamp={setSelectedStampType}
+          onPrint={handlePrint}
+          onGeolocate={handleGeolocate}
         />
-        <div className="hidden print:block print:fixed print:bottom-2 print:left-2 text-xs bg-white/80 p-1 rounded z-[1000]">
-          地図データ © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors
-        </div>
-      </main>
-      <Toolbar
-        selectedStampType={selectedStampType}
-        onSelectStamp={setSelectedStampType}
-        onPrint={handlePrint}
-        onGeolocate={handleGeolocate}
-      />
+      </div>
       <MemoModal
         isOpen={memoModalState.isOpen}
         onClose={() => {
