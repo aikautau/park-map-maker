@@ -172,8 +172,8 @@ function getPrintBounds(): L.LatLngBounds {
     return L.latLngBounds(topLeft, bottomRight);
 }
 
-// 印刷実行
-(window as any).printMap = async () => {
+// PDF出力
+(window as any).exportPDF = async () => {
     const frame = document.getElementById('print-frame')!;
     const frameRect = frame.getBoundingClientRect();
     const mapContainer = document.getElementById('map')!;
@@ -187,65 +187,79 @@ function getPrintBounds(): L.LatLngBounds {
         height: frameRect.height,
         useCORS: true,
         allowTaint: true,
-        scale: 3 // さらに高解像度
+        scale: 3 // 高解像度
     });
     
     // キャンバスを画像に変換
     const imgData = canvas.toDataURL('image/png');
     
-    // 印刷ウィンドウを開く
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-        printWindow.document.write(`
+    // PDF出力用のウィンドウを開く
+    const pdfWindow = window.open('', '_blank');
+    if (pdfWindow) {
+        pdfWindow.document.write(`
             <!DOCTYPE html>
             <html>
             <head>
-                <title>印刷プレビュー</title>
+                <meta charset="UTF-8">
+                <title>おさんぽマップ</title>
                 <style>
                     @page { 
                         size: A4 portrait; 
-                        margin: 0; 
+                        margin: 10mm; 
+                    }
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
                     }
                     body { 
                         margin: 0; 
-                        padding: 0;
+                        padding: 10mm;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
-                        justify-content: center;
-                        min-height: 100vh;
+                        background: white;
                     }
                     #map-image { 
-                        width: 210mm; 
-                        height: 210mm;
+                        width: 190mm; 
+                        height: 190mm;
                         object-fit: contain;
+                        display: block;
                     }
                     #credit {
                         text-align: center;
-                        font-size: 10pt;
+                        font-size: 9pt;
                         color: #666;
                         margin-top: 5mm;
+                        font-family: sans-serif;
+                    }
+                    @media print {
+                        body {
+                            padding: 0;
+                        }
+                        #map-image {
+                            width: 190mm;
+                            height: 190mm;
+                        }
                     }
                 </style>
             </head>
             <body>
-                <img id="map-image" src="${imgData}" alt="地図" />
+                <img id="map-image" src="${imgData}" alt="おさんぽマップ" />
                 <div id="credit">地図データ: © OpenStreetMap contributors</div>
+                <script>
+                    // 画像読み込み完了後に自動的に印刷ダイアログを表示
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 500);
+                    };
+                </script>
             </body>
             </html>
         `);
-        printWindow.document.close();
-        
-        // 画像読み込み完了後に印刷
-        setTimeout(() => {
-            printWindow.print();
-        }, 500);
+        pdfWindow.document.close();
     }
-};
-
-// PNG出力
-(window as any).exportPNG = async () => {
-    alert('PNG出力機能は実装中です。現在は印刷機能をご利用ください。');
 };
 
 // 初期化
