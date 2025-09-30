@@ -1,7 +1,7 @@
 // @ts-ignore
 import L from 'leaflet';
 
-// スタンプの定義
+// スタンプ定義
 const stamps = [
     { id: 'slide', label: 'すべり台', color: '#fbbf24' },
     { id: 'swing', label: 'ブランコ', color: '#38bdf8' },
@@ -17,41 +17,40 @@ const stamps = [
     { id: 'memo', label: '📝 メモ', color: '#a855f7' }
 ];
 
-// 状態管理
 let map: any;
 let selectedStamp: string | null = null;
 let markers: any[] = [];
 let pendingMemoPosition: L.LatLng | null = null;
 
-// 地図の初期化
+// 地図初期化
 function initMap() {
-    map = L.map('map').setView([35.6895, 139.6917], 13);
+    map = L.map('map', {
+        zoomControl: true,
+        attributionControl: true
+    }).setView([35.6895, 139.6917], 15);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        attribution: '© OpenStreetMap contributors',
         maxZoom: 19
     }).addTo(map);
 
-    // 地図クリックイベント
     map.on('click', (e: any) => {
         if (!selectedStamp) return;
         
         if (selectedStamp === 'memo') {
             pendingMemoPosition = e.latlng;
-            openModal();
+            (document.getElementById('memo-modal') as HTMLElement).classList.add('active');
         } else {
             addMarker(e.latlng, selectedStamp);
         }
     });
 }
 
-// スタンプボタンの生成
+// スタンプボタン生成
 function initStampButtons() {
     const grid = document.getElementById('stamp-grid')!;
-    const mobileGrid = document.getElementById('mobile-stamp-grid')!;
     
     stamps.forEach(stamp => {
-        // デスクトップ用ボタン
         const btn = document.createElement('button');
         btn.className = 'stamp-btn';
         btn.style.backgroundColor = stamp.color;
@@ -59,15 +58,6 @@ function initStampButtons() {
         btn.onclick = () => selectStamp(stamp.id);
         btn.setAttribute('data-stamp', stamp.id);
         grid.appendChild(btn);
-
-        // モバイル用ボタン
-        const mobileBtn = document.createElement('button');
-        mobileBtn.className = 'stamp-btn';
-        mobileBtn.style.backgroundColor = stamp.color;
-        mobileBtn.textContent = stamp.label;
-        mobileBtn.onclick = () => selectStamp(stamp.id);
-        mobileBtn.setAttribute('data-stamp', stamp.id);
-        mobileGrid.appendChild(mobileBtn);
     });
 }
 
@@ -79,7 +69,6 @@ function selectStamp(stampId: string) {
         selectedStamp = stampId;
     }
     
-    // UIの更新
     document.querySelectorAll('.stamp-btn').forEach(btn => {
         if (btn.getAttribute('data-stamp') === selectedStamp) {
             btn.classList.add('active');
@@ -89,52 +78,24 @@ function selectStamp(stampId: string) {
     });
 }
 
-// マーカーの追加
+// マーカー追加
 function addMarker(latlng: L.LatLng, stampId: string, text?: string) {
     const stamp = stamps.find(s => s.id === stampId)!;
     
-    // カスタムアイコンの作成
     let iconHtml = '';
-    
     if (stampId === 'memo' && text) {
         iconHtml = `
-            <div style="
-                display: inline-block;
-                background: ${stamp.color};
-                color: white;
-                padding: 8px 14px;
-                border-radius: 8px;
-                font-weight: bold;
-                font-size: 14px;
-                white-space: nowrap;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            ">${text}</div>
+            <div style="background:${stamp.color};color:white;padding:6px 12px;
+            border-radius:6px;font-weight:bold;font-size:12px;white-space:nowrap;
+            box-shadow:0 2px 6px rgba(0,0,0,0.3)">${text}</div>
         `;
     } else if (stampId === 'caution') {
-        iconHtml = `
-            <div style="
-                display: inline-block;
-                font-size: 32px;
-                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-            ">⚠️</div>
-        `;
+        iconHtml = `<div style="font-size:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))">⚠️</div>`;
     } else {
         iconHtml = `
-            <div style="
-                display: inline-block;
-                background: ${stamp.color};
-                color: white;
-                padding: 6px 12px;
-                border-radius: 8px;
-                font-weight: bold;
-                font-size: 13px;
-                white-space: nowrap;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            ">${stamp.label}</div>
+            <div style="background:${stamp.color};color:white;padding:4px 10px;
+            border-radius:6px;font-weight:bold;font-size:11px;white-space:nowrap;
+            box-shadow:0 2px 6px rgba(0,0,0,0.3)">${stamp.label}</div>
         `;
     }
     
@@ -147,25 +108,18 @@ function addMarker(latlng: L.LatLng, stampId: string, text?: string) {
     
     const marker = L.marker(latlng, { icon }).addTo(map);
     
-    // ポップアップの追加
-    const popupContent = `
-        <div style="text-align: center;">
+    marker.bindPopup(`
+        <div style="text-align:center">
             <strong>${stampId === 'memo' ? 'メモ' : stamp.label}</strong>
-            ${text ? `<p style="margin: 8px 0;">${text}</p>` : ''}
-            <button onclick="deleteMarker(${markers.length})" style="
-                background: #ef4444;
-                color: white;
-                border: none;
-                padding: 6px 12px;
-                border-radius: 6px;
-                cursor: pointer;
-                font-weight: bold;
-                margin-top: 8px;
-            ">削除</button>
+            ${text ? `<p style="margin:6px 0">${text}</p>` : ''}
+            <button onclick="deleteMarker(${markers.length})" 
+                style="background:#ef4444;color:white;border:none;padding:4px 10px;
+                border-radius:4px;cursor:pointer;font-weight:bold;margin-top:6px">
+                削除
+            </button>
         </div>
-    `;
+    `);
     
-    marker.bindPopup(popupContent);
     markers.push(marker);
 }
 
@@ -177,15 +131,9 @@ function addMarker(latlng: L.LatLng, stampId: string, text?: string) {
     }
 };
 
-// モーダル操作
-(window as any).openModal = () => {
-    document.getElementById('modal')!.classList.add('active');
-    (document.getElementById('memo-input') as HTMLTextAreaElement).value = '';
-    (document.getElementById('memo-input') as HTMLTextAreaElement).focus();
-};
-
-(window as any).closeModal = () => {
-    document.getElementById('modal')!.classList.remove('active');
+// メモモーダル
+(window as any).closeMemoModal = () => {
+    document.getElementById('memo-modal')!.classList.remove('active');
     pendingMemoPosition = null;
 };
 
@@ -195,8 +143,103 @@ function addMarker(latlng: L.LatLng, stampId: string, text?: string) {
     
     if (text && pendingMemoPosition) {
         addMarker(pendingMemoPosition, 'memo', text);
-        (window as any).closeModal();
+        (window as any).closeMemoModal();
+        input.value = '';
     }
+};
+
+// 印刷範囲の境界取得
+function getPrintBounds(): L.LatLngBounds {
+    const frame = document.getElementById('print-frame')!;
+    const frameRect = frame.getBoundingClientRect();
+    const mapContainer = document.getElementById('map')!;
+    const mapRect = mapContainer.getBoundingClientRect();
+    
+    // 枠の中心座標（地図コンテナ内での相対座標）
+    const frameCenterX = frameRect.left + frameRect.width / 2 - mapRect.left;
+    const frameCenterY = frameRect.top + frameRect.height / 2 - mapRect.top;
+    
+    // 枠の四隅の座標
+    const topLeft = map.containerPointToLatLng([
+        frameCenterX - frameRect.width / 2,
+        frameCenterY - frameRect.height / 2
+    ]);
+    const bottomRight = map.containerPointToLatLng([
+        frameCenterX + frameRect.width / 2,
+        frameCenterY + frameRect.height / 2
+    ]);
+    
+    return L.latLngBounds(topLeft, bottomRight);
+}
+
+// 印刷実行
+(window as any).printMap = async () => {
+    const bounds = getPrintBounds();
+    const frame = document.getElementById('print-frame')!;
+    const frameSize = frame.getBoundingClientRect();
+    
+    // 印刷用の一時的な地図を作成
+    const printDiv = document.createElement('div');
+    printDiv.style.width = '210mm';
+    printDiv.style.height = '210mm';
+    printDiv.style.position = 'absolute';
+    printDiv.style.left = '-9999px';
+    document.body.appendChild(printDiv);
+    
+    const printMapInstance = L.map(printDiv, {
+        zoomControl: false,
+        attributionControl: false
+    }).fitBounds(bounds);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(printMapInstance);
+    
+    // スタンプをコピー
+    markers.forEach(marker => {
+        if (marker && bounds.contains(marker.getLatLng())) {
+            L.marker(marker.getLatLng(), { icon: marker.options.icon }).addTo(printMapInstance);
+        }
+    });
+    
+    // クレジット追加
+    const credit = document.createElement('div');
+    credit.style.cssText = 'text-align:center;font-size:10pt;color:#666;padding:3mm 0;';
+    credit.textContent = '地図データ: © OpenStreetMap contributors';
+    
+    // レンダリング待機
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // 印刷ウィンドウ
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>印刷プレビュー</title>
+                <style>
+                    @page { size: A4 portrait; margin: 0; }
+                    body { margin: 0; padding: 0; }
+                    #print-container { width: 210mm; height: 210mm; }
+                </style>
+            </head>
+            <body>
+                <div id="print-container">${printDiv.innerHTML}</div>
+                ${credit.outerHTML}
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+            document.body.removeChild(printDiv);
+        }, 500);
+    }
+};
+
+// PNG出力
+(window as any).exportPNG = async () => {
+    alert('PNG出力機能は実装中です。現在は印刷機能をご利用ください。');
 };
 
 // 初期化
