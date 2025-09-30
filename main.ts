@@ -13,8 +13,8 @@ const stamps = [
     { id: 'fountain', label: '水飲み場', color: '#06b6d4' },
     { id: 'tap', label: '水道', color: '#0891b2' },
     { id: 'acorn', label: 'どんぐり', color: '#b45309' },
-    { id: 'caution', label: '⚠️ 注意', color: '#ef4444' },
-    { id: 'memo', label: '📝 メモ', color: '#a855f7' }
+    { id: 'caution', label: '注意', color: '#ef4444' },
+    { id: 'memo', label: 'メモ', color: '#a855f7' }
 ];
 
 let map: any;
@@ -81,29 +81,30 @@ function selectStamp(stampId: string) {
 // マーカー追加
 function addMarker(latlng: L.LatLng, stampId: string, text?: string) {
     const stamp = stamps.find(s => s.id === stampId)!;
+    const displayText = text || stamp.label;
     
-    let iconHtml = '';
-    if (stampId === 'memo' && text) {
-        iconHtml = `
-            <div style="display:inline-block;background:${stamp.color};color:white;padding:6px 12px;
-            border-radius:6px;font-weight:bold;font-size:12px;white-space:nowrap;
-            box-shadow:0 2px 6px rgba(0,0,0,0.3);line-height:1.2">${text}</div>
-        `;
-    } else if (stampId === 'caution') {
-        iconHtml = `<div style="display:inline-block;font-size:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))">⚠️</div>`;
-    } else {
-        iconHtml = `
-            <div style="display:inline-block;background:${stamp.color};color:white;padding:5px 11px;
-            border-radius:6px;font-weight:bold;font-size:12px;white-space:nowrap;
-            box-shadow:0 2px 6px rgba(0,0,0,0.3);line-height:1.3">${stamp.label}</div>
-        `;
-    }
+    // SVGで背景付きテキストを作成
+    const padding = 8;
+    const fontSize = 14;
+    const textLength = displayText.length * fontSize * 0.7; // 日本語の幅を推定
+    const width = textLength + padding * 2;
+    const height = fontSize + padding * 2;
+    
+    const iconHtml = `
+        <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+            <rect width="${width}" height="${height}" rx="6" ry="6" 
+                fill="${stamp.color}" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.3))"/>
+            <text x="${width/2}" y="${height/2 + fontSize/3}" 
+                font-family="sans-serif" font-size="${fontSize}" font-weight="bold" 
+                fill="white" text-anchor="middle">${displayText}</text>
+        </svg>
+    `;
     
     const icon = L.divIcon({
         html: iconHtml,
         className: 'custom-marker',
-        iconSize: undefined,
-        iconAnchor: [0, 0]
+        iconSize: [width, height],
+        iconAnchor: [width/2, height/2]
     });
     
     const marker = L.marker(latlng, { icon }).addTo(map);
