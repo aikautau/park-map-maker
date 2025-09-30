@@ -187,7 +187,7 @@ function getPrintBounds(): L.LatLngBounds {
         height: frameRect.height,
         useCORS: true,
         allowTaint: true,
-        scale: 2 // 高解像度
+        scale: 3 // さらに高解像度
     });
     
     // キャンバスを画像に変換

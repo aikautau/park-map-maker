@@ -40,8 +40,8 @@
         /* 印刷範囲枠（固定・正方形） */
         #print-frame {
             position: absolute;
-            width: 400px;
-            height: 400px;
+            width: min(600px, 80vw, 80vh);
+            height: min(600px, 80vw, 80vh);
             border: 4px dashed #3b82f6;
             background: rgba(59, 130, 246, 0.05);
             pointer-events: none;
@@ -157,10 +157,8 @@
             }
 
             #print-frame {
-                width: 80vw;
-                height: 80vw;
-                max-width: 90vh;
-                max-height: 90vh;
+                width: min(90vw, 90vh);
+                height: min(90vw, 90vh);
             }
         }
 
