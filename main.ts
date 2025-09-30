@@ -29,7 +29,7 @@ function initMap() {
     map = L.map('map').setView([35.6895, 139.6917], 13);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19
     }).addTo(map);
 
@@ -177,7 +177,7 @@ function addMarker(latlng: L.LatLng, stampId: string, text?: string) {
 // 印刷プレビュー切り替え
 (window as any).togglePreview = () => {
     showPreview = !showPreview;
-    const preview = document.getElementById('print-preview')!;
+    const preview = document.getElementById('print-preview-overlay')!;
     const btn = document.getElementById('preview-btn')!;
     
     if (showPreview) {
