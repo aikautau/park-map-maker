@@ -189,6 +189,11 @@
             font-weight: bold;
         }
 
+        /* 印刷用地図（通常は非表示） */
+        #print-map-container {
+            display: none;
+        }
+
         /* 印刷用クレジット（通常は非表示） */
         #print-credit {
             display: none;
@@ -300,69 +305,44 @@
                 padding: 0;
             }
 
-            /* ツールバーとモーダルを非表示 */
+            /* 通常の地図とUIを非表示 */
+            #app,
             #toolbar,
             #mobile-toolbar,
-            #modal,
-            .leaflet-control-zoom {
+            #modal {
                 display: none !important;
             }
 
-            /* appコンテナをリセット */
-            #app {
-                display: block;
-                width: 210mm;
-                height: 297mm;
-                background: white;
-                padding: 0;
-                margin: 0;
-            }
-
-            /* map-wrapperをリセット */
-            #map-wrapper {
-                display: block;
-                width: 210mm;
-                height: auto;
-                padding: 0;
-                margin: 0;
-                position: relative;
-                flex: none;
-            }
-
-            /* 地図を正確に配置 */
-            #map-container {
+            /* 印刷用地図コンテナを表示 */
+            #print-map-container {
+                display: block !important;
                 position: absolute;
                 top: 0;
                 left: 0;
                 width: 210mm;
                 height: 210mm;
-                max-width: none;
-                max-height: none;
-                box-shadow: none;
-                border-radius: 0;
                 margin: 0;
                 padding: 0;
             }
 
-            #map {
-                width: 210mm;
-                height: 210mm;
+            #print-map {
+                width: 210mm !important;
+                height: 210mm !important;
             }
 
             .leaflet-container {
-                background: white;
-                width: 210mm;
-                height: 210mm;
+                background: white !important;
+                width: 210mm !important;
+                height: 210mm !important;
             }
 
-            /* Leaflet標準のクレジットを非表示 */
-            .leaflet-control-attribution {
+            .leaflet-control-zoom {
                 display: none !important;
             }
 
             /* カスタムクレジットを表示 */
             #print-credit {
-                display: block;
+                display: block !important;
                 position: absolute;
                 top: 213mm;
                 left: 0;
@@ -382,7 +362,7 @@
         <div id="mobile-toolbar">
             <div class="mobile-header">
                 <h1>🎨 スタンプ選択</h1>
-                <button class="mobile-header-btn" onclick="window.print()">🖨️ 印刷</button>
+                <button class="mobile-header-btn" onclick="printMap()">🖨️ 印刷</button>
             </div>
             <div class="mobile-stamps">
                 <div class="mobile-stamp-grid" id="mobile-stamp-grid"></div>
@@ -395,6 +375,11 @@
                 <div id="map"></div>
             </div>
         </div>
+
+        <!-- 印刷用地図（印刷時のみ表示） -->
+        <div id="print-map-container">
+            <div id="print-map"></div>
+        </div>
         
         <!-- デスクトップツールバー -->
         <div id="toolbar">
@@ -402,7 +387,7 @@
             <div class="stamp-grid" id="stamp-grid"></div>
             
             <h2>🛠️ ツール</h2>
-            <button class="tool-btn primary" onclick="window.print()">🖨️ 印刷する</button>
+            <button class="tool-btn primary" onclick="printMap()">🖨️ 印刷する</button>
         </div>
     </div>
 

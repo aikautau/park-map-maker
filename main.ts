@@ -19,8 +19,10 @@ const stamps = [
 
 // 状態管理
 let map: any;
+let printMap: any = null;
 let selectedStamp: string | null = null;
 let markers: any[] = [];
+let printMarkers: any[] = [];
 let pendingMemoPosition: L.LatLng | null = null;
 
 // 地図の初期化
@@ -37,17 +39,70 @@ function initMap() {
         if (!selectedStamp) return;
         
         if (selectedStamp === 'memo') {
-            // メモの場合はモーダルを表示
             pendingMemoPosition = e.latlng;
             openModal();
         } else {
-            // その他のスタンプ
             addMarker(e.latlng, selectedStamp);
         }
     });
 }
 
-// スタンプボタンの生成（デスクトップ）
+// 印刷用地図を準備
+function preparePrintMap() {
+    // 既存の印刷用地図を削除
+    if (printMap) {
+        printMap.remove();
+        printMap = null;
+    }
+
+    // 現在の地図の表示範囲を取得
+    const bounds = map.getBounds();
+    const center = map.getCenter();
+    const zoom = map.getZoom();
+
+    // 印刷用地図コンテナを作成
+    const printContainer = document.getElementById('print-map')!;
+    
+    // 印刷用地図を初期化
+    printMap = L.map('print-map', {
+        zoomControl: false,
+        attributionControl: false
+    }).setView(center, zoom);
+    
+    // 同じタイルレイヤーを追加
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19
+    }).addTo(printMap);
+
+    // 表示範囲を合わせる
+    printMap.fitBounds(bounds);
+
+    // スタンプをコピー
+    printMarkers = [];
+    markers.forEach((marker) => {
+        if (marker) {
+            const latlng = marker.getLatLng();
+            const icon = marker.options.icon;
+            const printMarker = L.marker(latlng, { icon }).addTo(printMap);
+            printMarkers.push(printMarker);
+        }
+    });
+
+    // 地図のレンダリングを待つ
+    setTimeout(() => {
+        printMap.invalidateSize();
+    }, 100);
+}
+
+// 印刷実行
+(window as any).printMap = () => {
+    preparePrintMap();
+    setTimeout(() => {
+        window.print();
+    }, 500);
+};
+
+// スタンプボタンの生成
 function initStampButtons() {
     const grid = document.getElementById('stamp-grid')!;
     const mobileGrid = document.getElementById('mobile-stamp-grid')!;
@@ -81,7 +136,7 @@ function selectStamp(stampId: string) {
         selectedStamp = stampId;
     }
     
-    // UIの更新（デスクトップとモバイル両方）
+    // UIの更新
     document.querySelectorAll('.stamp-btn').forEach(btn => {
         if (btn.getAttribute('data-stamp') === selectedStamp) {
             btn.classList.add('active');
