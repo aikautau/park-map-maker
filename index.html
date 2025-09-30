@@ -25,8 +25,14 @@
             height: 100%;
         }
 
-        #map {
+        #map-container {
             flex: 1;
+            height: 100%;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
             height: 100%;
         }
 
@@ -103,7 +109,7 @@
             color: white;
         }
 
-        /* Print Preview */
+        /* Print Preview - 地図コンテナの中央に配置 */
         #print-preview {
             position: absolute;
             top: 50%;
@@ -111,13 +117,12 @@
             transform: translate(-50%, -50%);
             width: 210mm;
             height: 297mm;
-            max-width: 90vw;
-            max-height: 90vh;
-            border: 3px dashed #3b82f6;
-            background: rgba(59, 130, 246, 0.05);
+            border: 4px dashed #3b82f6;
+            background: rgba(59, 130, 246, 0.08);
             pointer-events: none;
             z-index: 999;
             display: none;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.2);
         }
 
         #print-preview.active {
@@ -131,10 +136,11 @@
             left: 10px;
             background: #3b82f6;
             color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 12px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
             font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         /* Custom marker styles */
@@ -232,6 +238,24 @@
                 font-size: 14px;
                 margin-bottom: 10px;
             }
+
+            #print-preview {
+                width: 148mm;
+                height: 210mm;
+            }
+
+            #print-preview::after {
+                content: '※横向きで印刷してください';
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                background: #f59e0b;
+                color: white;
+                padding: 6px 12px;
+                border-radius: 4px;
+                font-size: 11px;
+                font-weight: bold;
+            }
         }
 
         /* Print */
@@ -248,7 +272,7 @@
                 display: none !important;
             }
 
-            html, body, #app, #map {
+            html, body, #app, #map-container, #map {
                 width: 210mm !important;
                 height: 297mm !important;
                 margin: 0 !important;
@@ -264,7 +288,7 @@
             }
 
             @page {
-                size: A4;
+                size: A4 portrait;
                 margin: 0;
             }
         }
@@ -272,8 +296,10 @@
 </head>
 <body>
     <div id="app">
-        <div id="map"></div>
-        <div id="print-preview"></div>
+        <div id="map-container">
+            <div id="map"></div>
+            <div id="print-preview"></div>
+        </div>
         
         <div id="toolbar">
             <h2>🎨 スタンプ選択</h2>
