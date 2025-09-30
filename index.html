@@ -23,20 +23,44 @@
             display: flex;
             width: 100%;
             height: 100%;
+            background: #f3f4f6;
         }
 
-        #map-container {
+        /* 地図コンテナ - 正方形 */
+        #map-wrapper {
             flex: 1;
-            height: 100%;
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        #map-container {
+            width: 100%;
+            max-width: 90vh;
+            max-height: 90vh;
+            aspect-ratio: 1 / 1;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         #map {
             width: 100%;
             height: 100%;
+        }
+
+        /* クレジット表示 - 地図の外 */
+        #map-credit {
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 11px;
+            color: #666;
         }
 
         #toolbar {
@@ -112,7 +136,7 @@
             color: white;
         }
 
-        /* Print Preview */
+        /* Print Preview - 正方形の地図範囲 */
         #print-preview-overlay {
             position: absolute;
             top: 0;
@@ -131,16 +155,15 @@
         }
 
         #print-preview {
-            width: 210mm;
-            height: 297mm;
+            width: 100%;
+            height: 100%;
             border: 4px dashed #3b82f6;
             background: rgba(59, 130, 246, 0.08);
             position: relative;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.25);
         }
 
         #print-preview::before {
-            content: 'A4印刷範囲 (210mm × 297mm)';
+            content: '印刷範囲 (正方形)';
             position: absolute;
             top: 10px;
             left: 10px;
@@ -226,6 +249,15 @@
             #app {
                 flex-direction: column-reverse;
             }
+
+            #map-wrapper {
+                padding: 10px;
+            }
+
+            #map-container {
+                max-width: 95vw;
+                max-height: calc(100vh - 220px);
+            }
             
             #toolbar {
                 width: 100%;
@@ -253,6 +285,11 @@
                 font-size: 14px;
                 margin-bottom: 10px;
             }
+
+            #map-credit {
+                bottom: -25px;
+                font-size: 10px;
+            }
         }
 
         /* Print */
@@ -260,12 +297,6 @@
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-            }
-
-            #toolbar,
-            #print-preview-overlay,
-            .leaflet-control-zoom {
-                display: none !important;
             }
 
             html, body {
@@ -279,46 +310,58 @@
                 display: block !important;
                 width: 210mm !important;
                 height: 297mm !important;
+                background: white !important;
+            }
+
+            #toolbar,
+            #print-preview-overlay,
+            .leaflet-control-zoom,
+            #map-credit {
+                display: none !important;
+            }
+
+            #map-wrapper {
+                padding: 0 !important;
+                display: block !important;
+                width: 210mm !important;
+                height: 210mm !important;
             }
 
             #map-container {
+                max-width: none !important;
+                max-height: none !important;
                 width: 210mm !important;
-                height: 297mm !important;
+                height: 210mm !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
             }
 
             #map {
                 width: 210mm !important;
-                height: 297mm !important;
+                height: 210mm !important;
             }
 
             .leaflet-container {
                 background: white !important;
                 width: 210mm !important;
-                height: 297mm !important;
+                height: 210mm !important;
             }
 
-            /* 印刷時のクレジット表示 */
-            .leaflet-control-attribution {
-                display: block !important;
-                position: fixed !important;
-                bottom: 5mm !important;
-                right: 5mm !important;
-                background: rgba(255, 255, 255, 0.8) !important;
-                padding: 2mm 3mm !important;
-                font-size: 8pt !important;
-                border-radius: 2mm !important;
-            }
-
+            /* 印刷時のクレジット - 地図の下 */
             #print-credit {
                 display: block !important;
-                position: fixed;
-                bottom: 5mm;
-                left: 5mm;
-                font-size: 8pt;
+                position: absolute;
+                top: 210mm;
+                left: 0;
+                right: 0;
+                text-align: center;
+                font-size: 9pt;
                 color: #666;
-                background: rgba(255, 255, 255, 0.8);
-                padding: 2mm 3mm;
-                border-radius: 2mm;
+                padding: 3mm 0;
+            }
+
+            .leaflet-control-attribution {
+                display: none !important;
             }
 
             @page {
@@ -330,10 +373,15 @@
 </head>
 <body>
     <div id="app">
-        <div id="map-container">
-            <div id="map"></div>
-            <div id="print-preview-overlay">
-                <div id="print-preview"></div>
+        <div id="map-wrapper">
+            <div id="map-container">
+                <div id="map"></div>
+                <div id="print-preview-overlay">
+                    <div id="print-preview"></div>
+                </div>
+                <div id="map-credit">
+                    地図データ: © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors
+                </div>
             </div>
         </div>
         
@@ -349,7 +397,7 @@
     </div>
 
     <div id="print-credit">
-        地図: © OpenStreetMap contributors
+        地図データ: © OpenStreetMap contributors
     </div>
 
     <div id="modal">
