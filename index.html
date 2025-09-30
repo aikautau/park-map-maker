@@ -42,23 +42,22 @@
             position: absolute;
             width: min(600px, 80vw, 80vh);
             height: min(600px, 80vw, 80vh);
-            border: 4px dashed #3b82f6;
-            background: rgba(59, 130, 246, 0.05);
+            border: 3px dashed #3b82f6;
+            background: transparent;
             pointer-events: none;
             z-index: 1000;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
         }
 
         #print-frame::before {
-            content: '印刷範囲 (正方形)';
+            content: '📄 印刷範囲';
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: -30px;
+            left: 0;
             background: #3b82f6;
             color: white;
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
         }
 
