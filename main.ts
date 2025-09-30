@@ -174,41 +174,26 @@ function getPrintBounds(): L.LatLngBounds {
 
 // 印刷実行
 (window as any).printMap = async () => {
-    const bounds = getPrintBounds();
     const frame = document.getElementById('print-frame')!;
-    const frameSize = frame.getBoundingClientRect();
+    const frameRect = frame.getBoundingClientRect();
+    const mapContainer = document.getElementById('map')!;
     
-    // 印刷用の一時的な地図を作成
-    const printDiv = document.createElement('div');
-    printDiv.style.width = '210mm';
-    printDiv.style.height = '210mm';
-    printDiv.style.position = 'absolute';
-    printDiv.style.left = '-9999px';
-    document.body.appendChild(printDiv);
-    
-    const printMapInstance = L.map(printDiv, {
-        zoomControl: false,
-        attributionControl: false
-    }).fitBounds(bounds);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(printMapInstance);
-    
-    // スタンプをコピー
-    markers.forEach(marker => {
-        if (marker && bounds.contains(marker.getLatLng())) {
-            L.marker(marker.getLatLng(), { icon: marker.options.icon }).addTo(printMapInstance);
-        }
+    // html2canvasで印刷範囲をキャプチャ
+    // @ts-ignore
+    const canvas = await html2canvas(mapContainer, {
+        x: frameRect.left - mapContainer.getBoundingClientRect().left,
+        y: frameRect.top - mapContainer.getBoundingClientRect().top,
+        width: frameRect.width,
+        height: frameRect.height,
+        useCORS: true,
+        allowTaint: true,
+        scale: 2 // 高解像度
     });
     
-    // クレジット追加
-    const credit = document.createElement('div');
-    credit.style.cssText = 'text-align:center;font-size:10pt;color:#666;padding:3mm 0;';
-    credit.textContent = '地図データ: © OpenStreetMap contributors';
+    // キャンバスを画像に変換
+    const imgData = canvas.toDataURL('image/png');
     
-    // レンダリング待機
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // 印刷ウィンドウ
+    // 印刷ウィンドウを開く
     const printWindow = window.open('', '_blank');
     if (printWindow) {
         printWindow.document.write(`
@@ -217,22 +202,43 @@ function getPrintBounds(): L.LatLngBounds {
             <head>
                 <title>印刷プレビュー</title>
                 <style>
-                    @page { size: A4 portrait; margin: 0; }
-                    body { margin: 0; padding: 0; }
-                    #print-container { width: 210mm; height: 210mm; }
+                    @page { 
+                        size: A4 portrait; 
+                        margin: 0; 
+                    }
+                    body { 
+                        margin: 0; 
+                        padding: 0;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        min-height: 100vh;
+                    }
+                    #map-image { 
+                        width: 210mm; 
+                        height: 210mm;
+                        object-fit: contain;
+                    }
+                    #credit {
+                        text-align: center;
+                        font-size: 10pt;
+                        color: #666;
+                        margin-top: 5mm;
+                    }
                 </style>
             </head>
             <body>
-                <div id="print-container">${printDiv.innerHTML}</div>
-                ${credit.outerHTML}
+                <img id="map-image" src="${imgData}" alt="地図" />
+                <div id="credit">地図データ: © OpenStreetMap contributors</div>
             </body>
             </html>
         `);
         printWindow.document.close();
+        
+        // 画像読み込み完了後に印刷
         setTimeout(() => {
             printWindow.print();
-            printWindow.close();
-            document.body.removeChild(printDiv);
         }, 500);
     }
 };
