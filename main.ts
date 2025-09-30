@@ -85,24 +85,24 @@ function addMarker(latlng: L.LatLng, stampId: string, text?: string) {
     let iconHtml = '';
     if (stampId === 'memo' && text) {
         iconHtml = `
-            <div style="background:${stamp.color};color:white;padding:6px 12px;
+            <div style="display:inline-block;background:${stamp.color};color:white;padding:6px 12px;
             border-radius:6px;font-weight:bold;font-size:12px;white-space:nowrap;
-            box-shadow:0 2px 6px rgba(0,0,0,0.3)">${text}</div>
+            box-shadow:0 2px 6px rgba(0,0,0,0.3);line-height:1.2">${text}</div>
         `;
     } else if (stampId === 'caution') {
-        iconHtml = `<div style="font-size:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))">⚠️</div>`;
+        iconHtml = `<div style="display:inline-block;font-size:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3))">⚠️</div>`;
     } else {
         iconHtml = `
-            <div style="background:${stamp.color};color:white;padding:4px 10px;
-            border-radius:6px;font-weight:bold;font-size:11px;white-space:nowrap;
-            box-shadow:0 2px 6px rgba(0,0,0,0.3)">${stamp.label}</div>
+            <div style="display:inline-block;background:${stamp.color};color:white;padding:5px 11px;
+            border-radius:6px;font-weight:bold;font-size:12px;white-space:nowrap;
+            box-shadow:0 2px 6px rgba(0,0,0,0.3);line-height:1.3">${stamp.label}</div>
         `;
     }
     
     const icon = L.divIcon({
         html: iconHtml,
         className: 'custom-marker',
-        iconSize: [0, 0],
+        iconSize: undefined,
         iconAnchor: [0, 0]
     });
     
