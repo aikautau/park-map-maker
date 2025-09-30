@@ -91,6 +91,31 @@ function addMarker(latlng: L.LatLng, stampId: string, text?: string) {
     if (stampId === 'memo' && text) {
         iconHtml = `
             <div style="
+                display: inline-block;
+                background: ${stamp.color};
+                color: white;
+                padding: 8px 14px;
+                border-radius: 8px;
+                font-weight: bold;
+                font-size: 14px;
+                white-space: nowrap;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            ">${text}</div>
+        `;
+    } else if (stampId === 'caution') {
+        iconHtml = `
+            <div style="
+                display: inline-block;
+                font-size: 32px;
+                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            ">⚠️</div>
+        `;
+    } else {
+        iconHtml = `
+            <div style="
+                display: inline-block;
                 background: ${stamp.color};
                 color: white;
                 padding: 6px 12px;
@@ -99,26 +124,8 @@ function addMarker(latlng: L.LatLng, stampId: string, text?: string) {
                 font-size: 13px;
                 white-space: nowrap;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            ">${text}</div>
-        `;
-    } else if (stampId === 'caution') {
-        iconHtml = `
-            <div style="
-                font-size: 32px;
-                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-            ">⚠️</div>
-        `;
-    } else {
-        iconHtml = `
-            <div style="
-                background: ${stamp.color};
-                color: white;
-                padding: 5px 10px;
-                border-radius: 8px;
-                font-weight: bold;
-                font-size: 12px;
-                white-space: nowrap;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             ">${stamp.label}</div>
         `;
     }
