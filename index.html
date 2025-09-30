@@ -294,46 +294,65 @@
             }
 
             html, body {
-                width: 210mm !important;
-                height: 297mm !important;
-                margin: 0 !important;
-                padding: 0 !important;
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 0;
             }
 
-            /* 印刷時は地図とクレジットのみ表示 */
-            #app,
+            /* ツールバーとモーダルを非表示 */
             #toolbar,
             #mobile-toolbar,
-            #map-wrapper,
+            #modal,
             .leaflet-control-zoom {
                 display: none !important;
             }
 
-            /* 地図コンテナを再表示 */
+            /* appコンテナをリセット */
+            #app {
+                display: block;
+                width: 210mm;
+                height: 297mm;
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+
+            /* map-wrapperをリセット */
+            #map-wrapper {
+                display: block;
+                width: 210mm;
+                height: auto;
+                padding: 0;
+                margin: 0;
+                position: relative;
+                flex: none;
+            }
+
+            /* 地図を正確に配置 */
             #map-container {
-                display: block !important;
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 210mm !important;
-                height: 210mm !important;
-                max-width: none !important;
-                max-height: none !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-                margin: 0 !important;
-                padding: 0 !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 210mm;
+                height: 210mm;
+                max-width: none;
+                max-height: none;
+                box-shadow: none;
+                border-radius: 0;
+                margin: 0;
+                padding: 0;
             }
 
             #map {
-                width: 210mm !important;
-                height: 210mm !important;
+                width: 210mm;
+                height: 210mm;
             }
 
             .leaflet-container {
-                background: white !important;
-                width: 210mm !important;
-                height: 210mm !important;
+                background: white;
+                width: 210mm;
+                height: 210mm;
             }
 
             /* Leaflet標準のクレジットを非表示 */
@@ -343,16 +362,16 @@
 
             /* カスタムクレジットを表示 */
             #print-credit {
-                display: block !important;
-                position: absolute !important;
-                top: 210mm !important;
-                left: 0 !important;
-                width: 210mm !important;
-                text-align: center !important;
-                font-size: 9pt !important;
-                color: #666 !important;
-                padding: 3mm 0 !important;
-                margin: 0 !important;
+                display: block;
+                position: absolute;
+                top: 213mm;
+                left: 0;
+                width: 210mm;
+                text-align: center;
+                font-size: 9pt;
+                color: #666;
+                margin: 0;
+                padding: 0;
             }
         }
     </style>
