@@ -30,6 +30,7 @@
         #map-wrapper {
             flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
@@ -38,8 +39,7 @@
 
         #map-container {
             width: 100%;
-            max-width: 90vh;
-            max-height: 90vh;
+            max-width: min(90vh, calc(100vw - 320px));
             aspect-ratio: 1 / 1;
             position: relative;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -54,13 +54,14 @@
 
         /* クレジット表示 - 地図の外 */
         #map-credit {
-            position: absolute;
-            bottom: -30px;
-            left: 0;
-            right: 0;
-            text-align: center;
+            margin-top: 15px;
             font-size: 11px;
             color: #666;
+        }
+
+        #map-credit a {
+            color: #3b82f6;
+            text-decoration: none;
         }
 
         #toolbar {
@@ -136,34 +137,39 @@
             color: white;
         }
 
-        /* Print Preview - 正方形の地図範囲 */
+        /* Print Preview - 実際の210mm正方形 */
         #print-preview-overlay {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             display: none;
             align-items: center;
             justify-content: center;
             pointer-events: none;
             z-index: 999;
+            background: rgba(0, 0, 0, 0.3);
         }
 
         #print-preview-overlay.active {
             display: flex;
         }
 
+        /* 実際の210mm × 210mmサイズ */
         #print-preview {
-            width: 100%;
-            height: 100%;
+            width: 210mm;
+            height: 210mm;
+            max-width: 90%;
+            max-height: 90%;
             border: 4px dashed #3b82f6;
             background: rgba(59, 130, 246, 0.08);
             position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.4);
         }
 
         #print-preview::before {
-            content: '印刷範囲 (正方形)';
+            content: 'A4印刷範囲 (210mm × 210mm)';
             position: absolute;
             top: 10px;
             left: 10px;
@@ -174,6 +180,19 @@
             font-size: 14px;
             font-weight: bold;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        #print-preview::after {
+            content: 'この範囲が印刷されます';
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(59, 130, 246, 0.9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
         }
 
         /* Custom marker styles */
@@ -256,7 +275,7 @@
 
             #map-container {
                 max-width: 95vw;
-                max-height: calc(100vh - 220px);
+                max-height: calc(100vh - 240px);
             }
             
             #toolbar {
@@ -287,7 +306,7 @@
             }
 
             #map-credit {
-                bottom: -25px;
+                margin-top: 10px;
                 font-size: 10px;
             }
         }
@@ -307,10 +326,13 @@
             }
 
             #app {
-                display: block !important;
+                display: flex !important;
+                flex-direction: column !important;
                 width: 210mm !important;
                 height: 297mm !important;
                 background: white !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
             }
 
             #toolbar,
@@ -322,9 +344,11 @@
 
             #map-wrapper {
                 padding: 0 !important;
+                margin: 0 !important;
                 display: block !important;
                 width: 210mm !important;
                 height: 210mm !important;
+                flex: none !important;
             }
 
             #map-container {
@@ -334,6 +358,7 @@
                 height: 210mm !important;
                 box-shadow: none !important;
                 border-radius: 0 !important;
+                margin: 0 !important;
             }
 
             #map {
@@ -350,14 +375,12 @@
             /* 印刷時のクレジット - 地図の下 */
             #print-credit {
                 display: block !important;
-                position: absolute;
-                top: 210mm;
-                left: 0;
-                right: 0;
+                width: 210mm !important;
                 text-align: center;
                 font-size: 9pt;
                 color: #666;
-                padding: 3mm 0;
+                padding: 5mm 0;
+                margin: 0 !important;
             }
 
             .leaflet-control-attribution {
@@ -379,9 +402,9 @@
                 <div id="print-preview-overlay">
                     <div id="print-preview"></div>
                 </div>
-                <div id="map-credit">
-                    地図データ: © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors
-                </div>
+            </div>
+            <div id="map-credit">
+                地図データ: © <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors
             </div>
         </div>
         
