@@ -21,7 +21,6 @@ const stamps = [
 let map: any;
 let selectedStamp: string | null = null;
 let markers: any[] = [];
-let showPreview = false;
 let pendingMemoPosition: L.LatLng | null = null;
 
 // 地図の初期化
@@ -48,11 +47,13 @@ function initMap() {
     });
 }
 
-// スタンプボタンの生成
+// スタンプボタンの生成（デスクトップ）
 function initStampButtons() {
     const grid = document.getElementById('stamp-grid')!;
+    const mobileGrid = document.getElementById('mobile-stamp-grid')!;
     
     stamps.forEach(stamp => {
+        // デスクトップ用ボタン
         const btn = document.createElement('button');
         btn.className = 'stamp-btn';
         btn.style.backgroundColor = stamp.color;
@@ -60,6 +61,15 @@ function initStampButtons() {
         btn.onclick = () => selectStamp(stamp.id);
         btn.setAttribute('data-stamp', stamp.id);
         grid.appendChild(btn);
+
+        // モバイル用ボタン
+        const mobileBtn = document.createElement('button');
+        mobileBtn.className = 'stamp-btn';
+        mobileBtn.style.backgroundColor = stamp.color;
+        mobileBtn.textContent = stamp.label;
+        mobileBtn.onclick = () => selectStamp(stamp.id);
+        mobileBtn.setAttribute('data-stamp', stamp.id);
+        mobileGrid.appendChild(mobileBtn);
     });
 }
 
@@ -71,7 +81,7 @@ function selectStamp(stampId: string) {
         selectedStamp = stampId;
     }
     
-    // UIの更新
+    // UIの更新（デスクトップとモバイル両方）
     document.querySelectorAll('.stamp-btn').forEach(btn => {
         if (btn.getAttribute('data-stamp') === selectedStamp) {
             btn.classList.add('active');
@@ -166,28 +176,6 @@ function addMarker(latlng: L.LatLng, stampId: string, text?: string) {
     if (markers[index]) {
         map.removeLayer(markers[index]);
         markers[index] = null;
-    }
-};
-
-// 現在地へ移動
-(window as any).gotoCurrentLocation = () => {
-    map.locate({ setView: true, maxZoom: 16 });
-};
-
-// 印刷プレビュー切り替え
-(window as any).togglePreview = () => {
-    showPreview = !showPreview;
-    const preview = document.getElementById('print-preview-overlay')!;
-    const btn = document.getElementById('preview-btn')!;
-    
-    if (showPreview) {
-        preview.classList.add('active');
-        btn.classList.add('active');
-        btn.textContent = '✓ 印刷範囲';
-    } else {
-        preview.classList.remove('active');
-        btn.classList.remove('active');
-        btn.textContent = '📄 印刷範囲';
     }
 };
 
